@@ -8,7 +8,8 @@
 
 import React,{Component} from 'react';
 import { Navigation } from "react-native-navigation";
- 
+import SplashScreen from 'react-native-splash-screen'
+
 import {
   SafeAreaView,
   StyleSheet,
@@ -84,7 +85,8 @@ class Home  extends Component {
 		this.setState({ modalVisible: visible });
 	 }
 	   componentDidMount=()=>{
-		 
+		SplashScreen.hide();
+
 this.homeProgam();
 
 setInterval(()=>{		 
