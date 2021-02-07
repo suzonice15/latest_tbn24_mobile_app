@@ -31,7 +31,7 @@ import Pusher from 'pusher-js/react-native';
  import Video from 'react-native-video';
   
  import { RadioButton } from 'react-native-paper';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class Home  extends Component {
 	
@@ -71,9 +71,48 @@ class Home  extends Component {
 			submitVote:"Vote",
 			message:"",
 			chats:[],
+			loginUser:"",
+			send:"Send",
 		}
 		 
 	}
+	
+	
+		destroySessionData = async () => {
+  try {
+    await AsyncStorage.setItem('loginUser', "")
+	 this.setState({loginUser:""})
+    
+  } catch(e) {
+    // error reading value
+  }
+}
+	
+	
+	  storeSessionData = async () => {
+  try {
+	 var user_id= this.state.user_id;
+	 this.setState({loginUser:user_id});
+	  const jsonValue = JSON.stringify(user_id)
+    await AsyncStorage.setItem('loginUser', jsonValue)
+  } catch (e) {
+    // saving error
+  }
+}
+
+  getSessionData = async () => {
+  try {
+    const value = await AsyncStorage.getItem('loginUser')
+	 
+	 this.setState({loginUser:value})
+    if(value !== null) {
+      
+	//  Alert.alert(value)
+    }
+  } catch(e) {
+    // error reading value
+  }
+}
 	
 	
 	navigationButtonPressed({componentId}){
@@ -82,17 +121,20 @@ class Home  extends Component {
 				left:{
 					visible:true
 				}
-			}
+			},
+			 
 		});
 	}
 	submitChat(){
+		//this.storeSessionData();
+		
 		let message=this.state.message;
-		let user_id=this.state.user_id;
+		let user_id=this.state.loginUser;
 		if(user_id > 0){
 		if(message ==''){
 Alert.alert("Please Enter Your Message")
 		} else {
-
+this.setState({send:"Wait..."});
 			this.setState({
 				message:''
 			})
@@ -113,7 +155,7 @@ Alert.alert("Please Enter Your Message")
 				var URL="https://www.tbn24.com/api/chat/"+user_id;
 				var config={method:'GET'}
 				   fetch(URL,config).then((result)=>result.json()).then((response)=>{	
-							this.setState({chats:response});
+							this.setState({chats:response,send:"Send"});
 						 
 				   }).catch((error)=>{
 						
@@ -154,21 +196,20 @@ Alert.alert("Please Enter Your Message")
 
 	   componentDidMount=()=>{
 		SplashScreen.hide();
+		this.getSessionData();
+		 
 		Pusher.logToConsole = true;
 
 var pusher = new Pusher('ba7b245668d848c45d5a', {
   cluster: 'mt1'
 });
-var user_id=this.state.user_id;
-var channel = pusher.subscribe('my-channel');
+ var channel = pusher.subscribe('my-channel');
 channel.bind('my-event', data => {
   if(data.to){
 	  
-	if(data.to==this.state.user_id){
-		 	console.log("bolod Side");
-	 
-			console.log("Lower Side");
-			var URL="https://www.tbn24.com/api/chat/"+this.state.user_id;
+	if(data.to==this.state.loginUser){
+		 	 
+			var URL="https://www.tbn24.com/api/chat/"+this.state.loginUser;
 			var config={method:'GET'}
 			   fetch(URL,config).then((result)=>result.json()).then((response)=>{	
 						this.setState({chats:response});
@@ -187,8 +228,9 @@ this.homeProgam();
 setInterval(()=>{		 
 	this.homeProgam();
 	
-  }, 850000);
-  var user_id=this.state.user_id;
+  }, 990000);
+  var user_id=this.state.loginUser;
+   
 
   if(user_id > 0){
 	var URL="https://www.tbn24.com/api/chat/"+user_id;
@@ -229,6 +271,7 @@ setInterval(()=>{
 		  }, 500000);
 
 		  setInterval(()=>{
+		 
 		 
 			this.setState({isVisible: true,miniteShowNotice:false,mute:true})
 			 
@@ -334,7 +377,20 @@ var configHeader={
 				this.setState({loginButton: "Login"})
 
 			} else {
-				this.setState({mute:false,isVisible: false,user_id:responsData.user_id})
+				this.storeSessionData();
+				Navigation.push(this.props.componentId, {
+			component: {
+				name: 'HomePage', // Push the screen registered with the 'Settings' key
+				options: { // Optional options object to configure the screen
+					topBar: {
+						title: {
+							text: 'TBN24' // Set the TopBar title of the new Screen
+						}
+					}
+				}
+			}
+		})
+				this.setState({mute:false,isVisible: false,user_id:responsData.user_id,loginUser:responsData.user_id,})
 				this.setState({loginButton: "Login"})
  
 			}
@@ -666,7 +722,7 @@ source={{uri:'https://www.tbn24.com/public/uploads/program/'+this.state.nextProg
 
 {this.state.chats.map((chat)=>
 <View key={chat.id}>
-	{ chat.from==this.state.user_id ?
+	{ chat.from==this.state.loginUser ?
 
 <View>
 <Text style={styles.messageTime}>{chat.created_at}</Text>
@@ -707,7 +763,7 @@ source={{uri:'https://www.tbn24.com/public/uploads/program/'+this.state.nextProg
 	   </View>
 
 	   <View style={{flex:2}}>
-	  <Text  style={{backgroundColor:'red',textAlign:'center',padding:10,marginRight:0,marginTop:4,color:'white',fontSize:16,fontWeight:'bold'}} onPress={this.submitChat.bind(this)} >Send </Text>  
+	  <Text  style={{backgroundColor:'red',textAlign:'center',padding:10,marginRight:0,marginTop:4,color:'white',fontSize:16,fontWeight:'bold'}} onPress={this.submitChat.bind(this)} >{this.state.send}  </Text>  
 	  </View>
 
 		</View>

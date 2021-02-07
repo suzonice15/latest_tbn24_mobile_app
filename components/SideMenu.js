@@ -14,21 +14,27 @@ import {
 } from 'react-native';
 
 import { Navigation } from "react-native-navigation";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 class SideMenu  extends Component {
+
 
 	constructor(props){		
 		super(props);
  		this.state={
-			appVersion:'1.0',		
-		
-		}
-	}
+			appVersion:'1.0',
+			loginUser:"",		
+				}
+ 	}
 	
 	
 	   componentDidMount=()=>{
+		   
+		  this.getSessionData();
+		//  Alert.alert(this.state.loginUser)
 
-		
+ 		
 	 var URL="https://www.tbn24.com/api/appVersion";
 	 var config={method:'GET'}
 		fetch(URL,config).then((result)=>result.json()).then((response)=>{	
@@ -39,7 +45,30 @@ class SideMenu  extends Component {
 		
 	}
 	
-		
+		getSessionData = async () => {
+  try {
+    const value = await AsyncStorage.getItem('loginUser')
+	 this.setState({loginUser:value})
+    if(value !== null) {
+      
+  
+    }
+  } catch(e) {
+   //  Alert.alert(e)
+
+  }
+}
+
+		destroySessionData = async () => {
+  try {
+    await AsyncStorage.setItem('loginUser', "")
+	 this.setState({loginUser:""})
+    
+  } catch(e) {
+    // error reading value
+  }
+}
+
      openStore = () => {
     //This is the main trick
     if (Platform.OS != 'ios') {
@@ -356,7 +385,7 @@ Video=()=>{
         // dismissed
       }
     } catch (error) {
-      alert(error.message);
+      //alert(error.message);
     }
   };
 
@@ -386,7 +415,7 @@ render(){
 	 </View>
 	 
 	 <View style={{flex:5}}>
-<Text  onPress={this.About} style={styles.sideMenuTitle} >About US</Text>
+<Text  onPress={this.About} style={styles.sideMenuTitle} >About US   </Text>
 
 	 </View>
 	 
@@ -476,19 +505,6 @@ Today's Schedule
 	 
 	
 	 
-	   <View style={{flex:6,flexDirection:'row',padding:10,borderBottomWidth:1,borderColor:"#cacaca"}}>
-	 
-	 <View style={{flex:1,alignItems: 'flex-end',justifyContent:'center'}}>
-	 <Image   style={styles.sideImage}   source={require('../images/user.png')} />
-	 </View>
-	 
-	 
-	 <View style={{flex:5}}>
-<Text onPress={this.Login}  style={styles.sideMenuTitle} >Login</Text>
-
-	 </View>
-	 
-     </View>
 	 
 	  
 	 
@@ -545,6 +561,34 @@ Today's Schedule
 	 </View>
 	 
      </View>
+	 
+	 { this.state.loginUser > 0 ?
+	   <View style={{flex:6,flexDirection:'row',padding:10,borderBottomWidth:1,borderColor:"#cacaca"}}>
+	 
+	 <View style={{flex:1,alignItems: 'flex-end',justifyContent:'center'}}>
+	 <Image   style={styles.sideImage}   source={require('../images/cancel.png')} />
+	 </View>
+	 
+	 
+	 <View style={{flex:5}}>
+<Text onPress={this.destroySessionData}  style={styles.sideMenuTitle} >Logout  </Text>
+
+	 </View>
+	 
+     </View> : <View style={{flex:6,flexDirection:'row',padding:10,borderBottomWidth:1,borderColor:"#cacaca"}}>
+	 
+	 <View style={{flex:1,alignItems: 'flex-end',justifyContent:'center'}}>
+	 <Image   style={styles.sideImage}   source={require('../images/user.png')} />
+	 </View>
+	 
+	 
+	 <View style={{flex:5}}>
+<Text onPress={this.Login}  style={styles.sideMenuTitle} >Login  </Text>
+
+	 </View>
+	 
+     </View>
+	 }
 	 
 	 
 	   {/* <View style={{flex:6,flexDirection:'row',padding:10,borderBottomWidth:1,borderColor:"#cacaca"}}>

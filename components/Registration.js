@@ -22,6 +22,8 @@ import {
 } from 'react-native';
  import Video from 'react-native-video';
     import { Navigation } from "react-native-navigation";
+	import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 class Registration  extends Component {
@@ -35,10 +37,51 @@ class Registration  extends Component {
 		 phone:'',
 		 password:'',
 		 message:'',
-		 Registration:"Registration Now"
+		 Registration:"Registration Now",
+		 user_id:"",
 		 
 	 }
 	 }
+	 
+	 
+	  storeSessionData = async () => {
+  try {
+	 var user_id= this.state.user_id;
+	 
+	  const jsonValue = JSON.stringify(user_id)
+    await AsyncStorage.setItem('loginUser', jsonValue)
+  } catch (e) {
+    // saving error
+  }
+}
+	 
+	 Login=()=>{
+	
+	
+	Navigation.push('CenterScreen',{
+		
+		component:{
+			name:"LoginPage",
+			options:{
+				sideMenu:{
+					left:{
+						visible:false						
+					}
+				}
+				, topBar: {
+    title: {
+      text: 'Login',
+      color: 'white'
+    }
+				  }
+				  ,
+				    bottomTab: {
+    text: 'Settings'
+  }
+			}
+		}
+	})
+}
 	 dataStore=()=>{
 		this.setState({Registration: "Please Wait...."})
 
@@ -91,8 +134,9 @@ class Registration  extends Component {
 		 fetch(URL,config).then((response)=>response.text())
 		 .then((responsData)=>{
  			
-			 
-				Alert.alert(responsData)
+			 			this.setState({user_id: responsData})
+
+				this.storeSessionData();
 				
 				Navigation.push(this.props.componentId, {
 					component: {
@@ -192,25 +236,31 @@ Password </Text>
       
 	 <TouchableHighlight  onPress={this.dataStore}  underlayColor='none' >
 <Text style={styles.submit}  > {this.state.Registration}</Text>
-<Text>  Already have an account ?
-<TouchableHighlight  underlayColor='none' onPress={()=>{
-
-		Navigation.push(this.props.componentId, {
-			component: {
-				name: 'HomePage', // Push the screen registered with the 'Settings' key
-				options: { // Optional options object to configure the screen
-					topBar: {
-						title: {
-							text: 'Home' // Set the TopBar title of the new Screen
-						}
-					}
-				}
-			}
-		})
-	}}>Login </TouchableHighlight></Text>
-
  
 </TouchableHighlight>
+
+
+<View style={{backgroundColor:'white',marginTop:20,}} > 
+
+<View style={{backgroundColor:'white',textAlign:'center'}}>
+<Text  style={{color:'black',textAlign:'center',fontSize:18,marginTop:10}}> Already have an account ?</Text>
+</View>
+ 
+<TouchableHighlight  underlayColor='none'
+	 
+	 onPress={() => {
+	 
+		this.Login();}} 
+	  >
+<Text 
+ 
+ style={{color:'green',textAlign:'center',fontSize:18}}
+>Login</Text>
+</TouchableHighlight>
+
+ 
+</View>
+
 	 
 	  </View>
 	  
@@ -312,11 +362,13 @@ const styles = StyleSheet.create({
 	submit:{
 		fontSize:18,
 		borderColor: 'red',
-		padding:5,
+		padding:2,
 		color:'white',
 		borderWidth:1,
+		marginTop:10,
 		backgroundColor:'red',
 		textAlign: 'center',
+		height:25,
 	  },
 	  fieldRow:{
 		  fontSize:18,

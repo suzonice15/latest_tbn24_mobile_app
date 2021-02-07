@@ -20,6 +20,8 @@ import {
 } from 'react-native';
  import Video from 'react-native-video';
    import { Navigation } from "react-native-navigation";
+   import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 class Login  extends Component {
@@ -30,13 +32,25 @@ class Login  extends Component {
 		Navigation.events().bindComponent(this)
 		this.state={
 			 
-			email:'',
-		 
+			email:'',		 
 			password:'',			 
 			loginButton:"Login",
+			user_id:"",
 		 
 		}
 	}
+	
+	
+	  storeSessionData = async () => {
+  try {
+	 var user_id= this.state.user_id;
+	 
+	  const jsonValue = JSON.stringify(user_id)
+    await AsyncStorage.setItem('loginUser', jsonValue)
+  } catch (e) {
+    // saving error
+  }
+}
 
 	loginSubmit=()=>{
 		this.setState({loginButton: "Please Wait...."})
@@ -79,8 +93,10 @@ var configHeader={
 				this.setState({loginButton: "Login"})
 
 			} else {
-	 
-				Alert.alert("Login Success")
+				
+	 	this.setState({user_id: responsData.user_id})
+		this.storeSessionData();
+				
 				Navigation.push(this.props.componentId, {
 					component: {
 						name: 'HomePage', // Push the screen registered with the 'Settings' key
