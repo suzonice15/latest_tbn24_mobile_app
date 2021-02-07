@@ -24,8 +24,10 @@ import {
   Modal,
   StatusBar,
   FlatList,
+  PureComponent,
   Alert
 } from 'react-native';
+import Pusher from 'pusher-js/react-native';
  import Video from 'react-native-video';
   
  import { RadioButton } from 'react-native-paper';
@@ -50,7 +52,7 @@ class Home  extends Component {
 			email:'',
 			loginModalShowStatus:1,	
 			password:'',
-			user_id:0,
+			user_id:"",
 			showRegistrationModal:false,
 			modalVisible: false,
 			loginButton:"Login",
@@ -66,8 +68,11 @@ class Home  extends Component {
 			upcommingProgramDeatail:"",
 			upcommingProgamProgram_id:"",
 			pollAnswer:"",
-			submitVote:"Vote"
+			submitVote:"Vote",
+			message:"",
+			chats:[],
 		}
+		 
 	}
 	
 	
@@ -80,19 +85,121 @@ class Home  extends Component {
 			}
 		});
 	}
+	submitChat(){
+		let message=this.state.message;
+		let user_id=this.state.user_id;
+		if(user_id > 0){
+		if(message ==''){
+Alert.alert("Please Enter Your Message")
+		} else {
+
+			this.setState({
+				message:''
+			})
+			let URL='https://www.tbn24.com/api/chat/store';
+		 let configHeader={
+			 Accept:'application/json',
+			 'Content-Type':'application/json'
+		 }
+		 let configBody=JSON.stringify({
+			from:user_id,
+			message:message,				 
+		 });
+		 let config={method:'POST',headers:configHeader,body:configBody}
+		 fetch(URL,config).then((response)=>response.text())
+		 .then((responsData)=>{ 			  
+	
+			if(user_id > 0){
+				var URL="https://www.tbn24.com/api/chat/"+user_id;
+				var config={method:'GET'}
+				   fetch(URL,config).then((result)=>result.json()).then((response)=>{	
+							this.setState({chats:response});
+						 
+				   }).catch((error)=>{
+						
+				   });	 
+				}  
+
+		 }).catch((erorr)=>{
+
+		})
+
+		}
+	} else {
+
+		
+		this.setState({isVisible:true})
+	}
+	}
 
 	toggleModal(visible) {
 		this.setState({ modalVisible: visible });
 	 }
+
+	//  getChat(){
+	// 	var user_id=this.state.user_id;
+
+	// 	 if(user_id > 0){
+	// 	var URL="https://www.tbn24.com/api/chat/"+user_id;
+	// 	var config={method:'GET'}
+	// 	   fetch(URL,config).then((result)=>result.json()).then((response)=>{	
+	// 				this.setState({chats:response});
+				 
+	// 	   }).catch((error)=>{
+				
+	// 	   });	 
+	// 	}  
+	//  }
+
+
 	   componentDidMount=()=>{
 		SplashScreen.hide();
+		Pusher.logToConsole = true;
+
+var pusher = new Pusher('ba7b245668d848c45d5a', {
+  cluster: 'mt1'
+});
+var user_id=this.state.user_id;
+var channel = pusher.subscribe('my-channel');
+channel.bind('my-event', data => {
+  if(data.to){
+	  
+	if(data.to==this.state.user_id){
+		 	console.log("bolod Side");
+	 
+			console.log("Lower Side");
+			var URL="https://www.tbn24.com/api/chat/"+this.state.user_id;
+			var config={method:'GET'}
+			   fetch(URL,config).then((result)=>result.json()).then((response)=>{	
+						this.setState({chats:response});
+					 
+			   }).catch((error)=>{
+					
+			   });	 
+			 
+	}
+}
+});
+	
 
 this.homeProgam();
 
 setInterval(()=>{		 
 	this.homeProgam();
 	
-  }, 450000);
+  }, 850000);
+  var user_id=this.state.user_id;
+
+  if(user_id > 0){
+	var URL="https://www.tbn24.com/api/chat/"+user_id;
+	var config={method:'GET'}
+	   fetch(URL,config).then((result)=>result.json()).then((response)=>{	
+				this.setState({chats:response});
+			 
+	   }).catch((error)=>{
+			
+	   });	 
+	}  
 
 		
 	 var URL="https://www.tbn24.com/api/video";
@@ -110,8 +217,7 @@ setInterval(()=>{
 		fetch(URLNotice,configNotice).then((result)=>result.json()).then((response)=>{	
 	 			this.setState({registrationNotice:response.five_minite,loginNotice:response.one_hour});
 		}).catch((error)=>{
-			Alert.alert("No Internet Connection","You need to be connected to your network or Wi-Fi or Mobile Data"); 
-
+ 
 			 
 		});	
 	
@@ -157,11 +263,7 @@ allPull(){
 					 refressicon:false});
 		}).catch((error)=>{
 			this.setState({loading:false,refressicon:false});
-			
-			 Alert.alert(
-      'No Internet Connection',
-      'You need to be connected to your network or Wi-Fi');
-			  
+		 	  
 
 			
 		});
@@ -238,7 +340,7 @@ var configHeader={
 			}
 			  
 		 }).catch((erorr)=>{
-			Alert.alert("No Internet Connection","You need to be connected to your network or Wi-Fi or Mobile Data"); 
+
 			this.setState({loginButton: "Login"})
 		 })
 		 
@@ -554,7 +656,61 @@ source={{uri:'https://www.tbn24.com/public/uploads/program/'+this.state.nextProg
 
 {  this.state.chatClassActive ?
 
-<View style={{flex:36,color:'white',height:"100%",marginTop:5,flexDirection:'row',width:'100%',backgroundColor:'white'}}>
+<View style={{flex:36,color:'white',height:"100%",marginTop:5,width:'100%',backgroundColor:'white'}}>
+<View style={{flex:28}}>
+
+<ScrollView  ref='_scrollView'
+  onContentSizeChange={() => { this.refs._scrollView.scrollTo({x: 999919999999999, y: 0, animated: true}); }}>
+ 
+<View  style={{padding:10}}>
+
+{this.state.chats.map((chat)=>
+<View key={chat.id}>
+	{ chat.from==this.state.user_id ?
+
+<View>
+<Text style={styles.messageTime}>{chat.created_at}</Text>
+<Text style={styles.userMessage} >{chat.message}
+	 </Text>
+	</View>:
+	<View>
+		<Text style={styles.messageTime}>{chat.created_at}</Text>
+
+	<Text style={styles.adminMessage}>{chat.message}
+ </Text>
+	 </View>
+	}
+
+	
+
+		 </View>
+
+)}
+ 
+
+ 
+ 
+ </View>
+
+</ScrollView>
+</View>
+<View style={{flex:8,flexDirection:'row',padding:3}}>
+	 <View style={{flex:6}}>
+	  <TextInput
+	  onChangeText={(value)=>this.setState({message:value})}
+    multiline={true}
+	 placeholder="Enter Your Message"
+	numberOfLines={2}
+	value={this.state.message}
+    style={{fontSize:20, margin: 5,height:40,width:360, borderRadius:5,  borderColor: 'red',
+      borderWidth: 1,textAlignVertical: 'top',}}/>
+	   </View>
+
+	   <View style={{flex:2}}>
+	  <Text  style={{backgroundColor:'red',textAlign:'center',padding:10,marginRight:0,marginTop:4,color:'white',fontSize:16,fontWeight:'bold'}} onPress={this.submitChat.bind(this)} >Send </Text>  
+	  </View>
+
+		</View>
 
 
  </View>: null
@@ -692,8 +848,33 @@ source={{uri:'https://www.tbn24.com/public/uploads/program/'+this.state.nextProg
 }
 
 const styles = StyleSheet.create({
+	 messageTime:{
+	  textAlign:'center',
+	  color:'black'
+	 },
+    adminMessage:{
+	 backgroundColor:'red',
+	 color:'white',
+	 width:300,
+	 padding:10,
+	 marginLeft:0,
+	 margin:5,
+	 borderRadius:50,
+
 	 
-    
+	},
+	userMessage:{
+		backgroundColor:'green',
+		color:'white',
+		width:300,
+		padding:10,
+		margin:5,
+		marginRight:0,
+		borderRadius:50,
+		marginLeft:80,
+		 
+		 
+	   },
   homeCategoryTitle:{
 color:'black',
 fontSize:15,

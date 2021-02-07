@@ -192,6 +192,24 @@ Password </Text>
       
 	 <TouchableHighlight  onPress={this.dataStore}  underlayColor='none' >
 <Text style={styles.submit}  > {this.state.Registration}</Text>
+<Text>  Already have an account ?
+<TouchableHighlight  underlayColor='none' onPress={()=>{
+
+		Navigation.push(this.props.componentId, {
+			component: {
+				name: 'HomePage', // Push the screen registered with the 'Settings' key
+				options: { // Optional options object to configure the screen
+					topBar: {
+						title: {
+							text: 'Home' // Set the TopBar title of the new Screen
+						}
+					}
+				}
+			}
+		})
+	}}>Login </TouchableHighlight></Text>
+
+ 
 </TouchableHighlight>
 	 
 	  </View>
