@@ -74,6 +74,7 @@ class Home  extends Component {
 			loginUser:"",
 			send:"Send",
 		}
+		    this.ScrollView = React.createRef();
 		 
 	}
 	
@@ -378,18 +379,7 @@ var configHeader={
 
 			} else {
 				this.storeSessionData();
-				Navigation.push(this.props.componentId, {
-			component: {
-				name: 'HomePage', // Push the screen registered with the 'Settings' key
-				options: { // Optional options object to configure the screen
-					topBar: {
-						title: {
-							text: 'TBN24' // Set the TopBar title of the new Screen
-						}
-					}
-				}
-			}
-		})
+				 
 				this.setState({mute:false,isVisible: false,user_id:responsData.user_id,loginUser:responsData.user_id,})
 				this.setState({loginButton: "Login"})
  
@@ -715,8 +705,14 @@ source={{uri:'https://www.tbn24.com/public/uploads/program/'+this.state.nextProg
 <View style={{flex:36,color:'white',height:"100%",marginTop:5,width:'100%',backgroundColor:'white'}}>
 <View style={{flex:28}}>
 
-<ScrollView  ref='_scrollView'
-  onContentSizeChange={() => { this.refs._scrollView.scrollTo({x: 999919999999999, y: 0, animated: true}); }}>
+<ScrollView    showsVerticalScrollIndicator={false}
+  // define ref
+  ref={ref => (this.ScrollView = ref)}
+  // use for store scrolled value
+  onScroll={event =>
+      this.setState({horizontalScroll:event.nativeEvent.contentOffset.x, VerticalScroll:event.nativeEvent.contentOffset.y})
+  }
+  >
  
 <View  style={{padding:10}}>
 
