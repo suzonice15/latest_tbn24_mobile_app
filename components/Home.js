@@ -705,14 +705,8 @@ source={{uri:'https://www.tbn24.com/public/uploads/program/'+this.state.nextProg
 <View style={{flex:36,color:'white',height:"100%",marginTop:5,width:'100%',backgroundColor:'white'}}>
 <View style={{flex:28}}>
 
-<ScrollView    showsVerticalScrollIndicator={false}
-  // define ref
-  ref={ref => (this.ScrollView = ref)}
-  // use for store scrolled value
-  onScroll={event =>
-      this.setState({horizontalScroll:event.nativeEvent.contentOffset.x, VerticalScroll:event.nativeEvent.contentOffset.y})
-  }
-  >
+<ScrollView    ref='_scrollView'
+  onContentSizeChange={() => { this.refs._scrollView.scrollTo({x: 9999999999999, y: 9999999999999, animated: true}); }}>
  
 <View  style={{padding:10}}>
 
