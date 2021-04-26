@@ -1,0 +1,4 @@
+1.app logo size of android 512*512
+2.buttom image size 32*32
+3.left image size 24*24
+4.starting image size 360*700
