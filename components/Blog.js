@@ -114,6 +114,8 @@ ChildView=({post_id,post_created_date,post_title,post_name,post_picture,post_des
   return (  
    
     <View style={{flex:100,width:"100%"}}> 	
+
+	{/* //dddd */}
  
 	
 	 <View style={{flex:94,width:"100%",backgroundColor:'white',margin:5}}>
