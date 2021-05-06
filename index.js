@@ -59,47 +59,53 @@ Navigation.setDefaultOptions({
   bottomTab: {
     fontSize: 14,
     selectedFontSize: 14,
-	backgroundColor:'red'
+    backgroundColor:'red'
   }
 });
 
+const sideMenu ={
+    left:{
+        component:{
+            name:'SideMenuPage'
+        }
+    },
+    center:{
+        stack:{
+            id:"centerPage",
+            children:[
+                {
+                    component:{
+                        name:"HomePage",
+                        options:{
+                            topBar:{
+                                title:{
+                                    text:"TBN24"
+                                },
+                                leftButtons: [
+                                    {
+                                        icon: require('./images/menu.png'),
+                                        id: 'toggleDrawer',
+                                    },
+                                ],
+                            }
+                        }
+                    }
+                }
+            ]
+        }
 
-Navigation.events().registerAppLaunchedListener(() => {
-    Navigation.setRoot({
-    root: {
-      sideMenu:{
-          left:{
-              component:{
-                  name:'SideMenuPage'
-              }
-          },
-          center:{
-
-              stack:{
-				 id:"CenterScreen",
-                  children:[
-                      {
-                          component:{
-                              name:"HomePage",
-							   options:{
-								   topBar:{
-									   title:{
-										   text:"TBN24"
-                     },
-                     leftButtons:{
-                       icon: require('./images/menu.png')
-                     }
-								   }
-				 				  
-				              }
-                          }
-                      }
-                  ]
-              }
-
-          }
-      },
-	     
     }
-});
-});
+}
+
+
+
+Navigation.events().registerAppLaunchedListener(()=>{
+    Navigation.setRoot({
+        root:{
+            sideMenu
+        }
+    })
+})
+
+
+

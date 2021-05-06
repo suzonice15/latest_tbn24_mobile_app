@@ -114,38 +114,19 @@ ChildView=({post_id,post_created_date,post_title,post_name,post_picture,post_des
   return (  
    
     <View style={{flex:100,width:"100%"}}> 	
-
-	{/* //dddd */}
- 
-	
 	 <View style={{flex:94,width:"100%",backgroundColor:'white',margin:5}}>
-	<ScrollView>
-   
+	<ScrollView>   
 <View style={{margin:5,padding:10,flex:1,flexDirection:'column'}}>
-
-
-
-
 	   <View>
  { 	this.state.loading ?
 	     <ActivityIndicator  style={{fontSize:30,marginTop:100}}size="large" color="red" />:null		 
 		 }
-		  </View>
-
-    
+		  </View>   
  
  <FlatList  numColumns={1} data={this.state.Data}   keyExtractor={item =>item.post_id.toString()} renderItem={({item})=><this.ChildView post_id={item.post_id} post_title={item.post_title} post_name={item.post_name} post_picture={item.post_picture} post_description={item.post_description} post_created_date={item.post_created_date} post_view={item.post_view}   />} />
-
 </View>
-
-
 	</ScrollView>
 	</View>
-
-
-	 
-		
-  
   
  <View style={{flex:6,flexDirection:'row',color:'white',width:'100%',padding:10, backgroundColor:'#5A0000'}}>
 	<View style={{flex:2,justifyContent:'center','alignItems':'center'}} >
